@@ -1,0 +1,13 @@
+services:
+  coordinator:
+    build: .
+    image: mic-frequency-coordinator:latest
+    container_name: mic-frequency-coordinator
+    ports:
+      - "8000:8000"
+    volumes:
+      - mic_data:/data
+    restart: unless-stopped
+
+volumes:
+  mic_data:

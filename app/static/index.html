@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>无线话筒频点协调台</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>🎙️ 无线话筒频点协调台</h1>
+  <div class="plan-bar">
+    <input id="planName" type="text" placeholder="演出方案名称" maxlength="128">
+    <button id="btnNew" type="button">新建</button>
+    <button id="btnSave" type="button" class="primary">保存方案</button>
+    <select id="savedSelect" title="已保存方案">
+      <option value="">— 打开已保存方案 —</option>
+    </select>
+    <button id="btnDelete" type="button" class="danger">删除</button>
+  </div>
+</header>
+
+<main>
+  <section class="card" id="editorCard">
+    <div class="card-head">
+      <h2>设备与候选频点</h2>
+      <div class="hint">设备 ID 按录入顺序从 1 开始；候选频点为正整数 kHz，1～12 个且互异，用空格/逗号分隔。</div>
+    </div>
+    <table class="dev-table">
+      <thead>
+        <tr>
+          <th class="col-id">ID</th>
+          <th class="col-name">设备名称</th>
+          <th class="col-cand">候选频点（kHz，互异）</th>
+          <th class="col-cur">现用频点（可选）</th>
+          <th class="col-lock">锁定</th>
+          <th class="col-op"></th>
+        </tr>
+      </thead>
+      <tbody id="devTbody"></tbody>
+    </table>
+    <button id="btnAddDevice" type="button" class="ghost">＋ 添加话筒（2～8 支）</button>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>约束与求解参数</h2></div>
+    <div class="settings-grid">
+      <label>最小频差 d（kHz，正整数）
+        <input id="minGap" type="number" min="1" step="1" value="100">
+      </label>
+      <label>互调容差 g（kHz，非负）
+        <input id="imdTol" type="number" min="0" step="1" value="200">
+      </label>
+      <label>求解时限（秒，正整数）
+        <input id="timeLimit" type="number" min="1" step="1" value="10">
+      </label>
+    </div>
+    <div class="forbidden-box">
+      <div class="row-between">
+        <h3>禁用闭区间（kHz）</h3>
+        <button id="btnAddForbidden" type="button" class="ghost small">＋ 添加禁用区间</button>
+      </div>
+      <table class="forbidden-table">
+        <thead><tr><th>起点</th><th>终点</th><th></th></tr></thead>
+        <tbody id="forbiddenTbody"></tbody>
+      </table>
+    </div>
+    <div class="solve-row">
+      <button id="btnSolve" type="button" class="primary big">▶ 协调求解</button>
+      <span id="formError" class="form-error"></span>
+    </div>
+  </section>
+
+  <section class="card" id="resultCard" hidden>
+    <div class="card-head">
+      <h2>求解结果</h2>
+      <span id="statusBadge" class="badge"></span>
+      <span id="solveMeta" class="meta"></span>
+    </div>
+    <div id="conflictBox" class="conflict-box" hidden>
+      <h3>⛔ 锁定设备集合冲突，无法求解：</h3>
+      <ul id="conflictList"></ul>
+    </div>
+    <div id="resultTableWrap">
+      <table class="dev-table result-table">
+        <thead>
+          <tr>
+            <th class="col-id">ID</th>
+            <th class="col-name">名称</th>
+            <th class="col-lock">锁定</th>
+            <th>现用频点</th>
+            <th>分配频点（kHz）</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody id="resultTbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="spectrumCard">
+    <div class="card-head">
+      <h2>频谱视图</h2>
+      <div class="legend">
+        <span><i class="lg-assigned"></i>已分配频点</span>
+        <span><i class="lg-guard"></i>±d 保护带</span>
+        <span><i class="lg-current"></i>现用频点</span>
+        <span><i class="lg-cand"></i>候选频点</span>
+        <span><i class="lg-forbid"></i>禁用区间</span>
+      </div>
+    </div>
+    <canvas id="spectrum"></canvas>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
